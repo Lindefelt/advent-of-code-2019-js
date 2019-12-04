@@ -32,27 +32,28 @@ function buildWire(input){
     var  wire = []
 
     var x = 0,y = 0
-
+    var stepCount = 0
     input.forEach((e)=>{
-        var  steps = e.slice(1)
+        var steps = e.slice(1)
+        
         if(e[0]=="L"){
             for(var i = 0; i < steps; i++ ){
-                wire.push({x: x--, y: y})
+                wire.push({x: x--, y: y, steps: stepCount++})
             }
         }
         if(e[0]=="R"){
             for(var i = 0; i < steps; i++ ){
-                wire.push({x: x++, y: y})
+                wire.push({x: x++, y: y, steps: stepCount++})
             }
         }
         if(e[0]=="D"){
             for(var i = 0; i < steps; i++ ){
-                wire.push({x: x, y: y--})
+                wire.push({x: x, y: y--, steps: stepCount++})
             }
         }
         if(e[0]=="U"){
             for(var i = 0; i < steps; i++ ){
-                wire.push({x: x, y: y++})
+                wire.push({x: x, y: y++, steps: stepCount++})
             }
         }
     })
@@ -65,7 +66,8 @@ function getIntersections(wire1,wire2){
     wire1.forEach((p1)=>{
         wire2.forEach((p2)=>{
             if(p1.x == p2.x && p1.y == p2.y){
-                console.log("found intersection at;",p1)
+                console.log("found intersection at:",p1)
+                p1.steps+=p2.steps
                 intersections.push(p1)
             }
             
@@ -78,7 +80,7 @@ function getIntersections(wire1,wire2){
 
 function getShortestDistance(intersections){
     var shortest = Number.MAX_VALUE;
-    intersections.forEach((p)=>{
+    intersections.slice(1).forEach((p)=>{
         distance = Math.abs(p.x)+Math.abs(p.y)
         if(distance<shortest && distance>0){
             shortest = distance
@@ -87,14 +89,29 @@ function getShortestDistance(intersections){
     return shortest
 }
 
+function getShortestRoundtrip(intersections){
+    var shortest = Number.MAX_VALUE;
+    intersections.forEach((p)=>{
+        distance = p.steps
+        if(distance<shortest && distance>0){
+            shortest = distance
+        }
+    })
+    return shortest 
+}
+
+
 
 console.log("building wire 1")
-var wire1 = buildWire(input1.split(","))
+var wire1 = buildWire(input1.split(","))//buildWire(testInputW1)
 console.log("building wire 2")
-var wire2 = buildWire(input2.split(","))
+var wire2 = buildWire(input2.split(","))//buildWire(testInputW2)
 console.log("finding intersections")
 var intersections = getIntersections(wire1,wire2)
 console.log(intersections)
 console.log("finding shortest")
 var shortest = getShortestDistance(intersections)
 console.log(shortest)
+console.log("finding shortest roundtrip")
+var shortestRoundtrip = getShortestRoundtrip(intersections)
+console.log(shortestRoundtrip)
